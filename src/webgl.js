@@ -1,34 +1,37 @@
 var webgl = {
+
     gl: null,
     shaderProgram: null,
     cube: {},
+
     init: function (canvas) {
         this.initGL(canvas);
         this.shaderProgram = this.initShaders();
         this.initBuffers();
-
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        this.gl.enable(this.gl.DEPTH_TEST);
     },
 
     initGL: function (canvas) {
-        this.gl = canvas.getContext("experimental-webgl");
-        if (!this.gl) {
-            throw Error("Sorry, no webgl.");
+        var gl = this.gl = canvas.getContext("experimental-webgl");
+        if (!gl) {
+            throw new Error("Sorry, no webgl.");
         }
-        this.gl.viewportWidth = canvas.width;
-        this.gl.viewportHeight = canvas.height;
+        gl.viewportWidth = canvas.width;
+        gl.viewportHeight = canvas.height;
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
     },
 
     compile: function (code, isFrag) {
         var gl = this.gl,
             shader = gl.createShader(isFrag ? gl.FRAGMENT_SHADER : gl.VERTEX_SHADER);
+
         gl.shaderSource(shader, code);
         gl.compileShader(shader);
 
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            console.error("Bad shader code:", gl.getShaderInfoLog(shader));
-            return null;
+            console.error(gl.getShaderInfoLog(shader));
+            throw new Error("Bad shader code");
         }
         return shader;
     },
@@ -133,22 +136,25 @@ var webgl = {
 
         cubeCol = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeCol);
-        var colors = [
-           [1.0, 0.0, 0.0, 1.0], // Front face
-            [1.0, 1.0, 0.0, 1.0], // Back face
-            [0.0, 1.0, 0.0, 1.0], // Top face
-            [1.0, 0.5, 0.5, 1.0], // Bottom face
-            [1.0, 0.0, 1.0, 1.0], // Right face
-            [0.0, 0.0, 1.0, 1.0]  // Left face
+        var colors = (function () {
+            var colors = [
+                    [0.8, 0.0, 0.0, 0.8], // Front face
+                    [0.8, 0.8, 0.0, 0.8], // Back face
+                    [0.0, 0.8, 0.0, 0.8], // Top face
+                    [0.8, 0.5, 0.5, 0.8], // Bottom face
+                    [0.8, 0.0, 0.8, 0.8], // Right face
+                    [0.0, 0.0, 0.8, 0.8]  // Left face
                 ],
-        unpackedColors = [];
-        for (var i in colors) {
-            var color = colors[i];
-            for (var j=0; j < 4; j++) {
-                unpackedColors = unpackedColors.concat(color);
+                unpackedColors = [];
+            for (var i in colors) {
+                var color = colors[i];
+                for (var j=0; j < 4; j++) {
+                    unpackedColors = unpackedColors.concat(color);
+                }
             }
-        }
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
+            return unpackedColors;
+        }());
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
         cubeCol.itemSize = 4;
         cubeCol.numItems = 24;
 
@@ -193,9 +199,9 @@ var webgl = {
 
         var id = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
             out = id.slice(0)
-            tmp = id.slice(0);
+            tmp = id.slice(0),
+            rot = 0;
 
-        tmp = id.slice(0);
         var X = (Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
         tmp[5] = Math.cos(X);
         tmp[6] = Math.sin(X);
@@ -211,18 +217,17 @@ var webgl = {
         tmp[5] = Math.cos(Z);
         out = matrix.mult(out, tmp);
 
-         tmp = id.slice(0);
-        tmp[12] = 0;
+        // Translate
+        tmp = id.slice(0);
+        tmp[12] = (Math.sin(Date.now() / 1000) * 2);
         tmp[13] = 0.2;
         tmp[14] = 5 * -1;
         out = matrix.mult(out, tmp);
 
-        var PerspectiveMatrix = matrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 1000.0);
-        gl.uniformMatrix4fv(prog.pMatrixUniform, false, PerspectiveMatrix);
+        gl.uniformMatrix4fv(prog.pMatrixUniform, false, matrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 1000.0));
         gl.uniformMatrix4fv(prog.mvMatrixUniform, false, out);
 
         gl.drawElements(gl.TRIANGLES, this.cube.indices.numItems, gl.UNSIGNED_SHORT, 0);
-
 
     }
 };
