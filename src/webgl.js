@@ -81,62 +81,57 @@ var webgl = {
         return prog;
     },
 
-    initBuffers: function () {
+    getChunk: function () {
+        var verts = [],
+            cols = [],
+            indices = [],
+            cubes = 100;
 
-        var gl = this.gl,
-            cubePos,
-            cubeCol,
-            cubeIndex;
+        for (var i = 0; i < cubes; i++) {
 
-        cubePos = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubePos);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array([
+            var xo = (i % (cubes / 10) | 0) * 2,
+                yo = (i / (cubes / 10) | 0) * 2,
+                zo = (Math.random() * 20 | 0) * 2;
+
+        verts = verts.concat([
                 // Front face
-            -1.0, -1.0,  1.0,
-             1.0, -1.0,  1.0,
-             1.0,  1.0,  1.0,
-            -1.0,  1.0,  1.0,
+            xo + -1.0, yo + -1.0,  zo + 1.0,
+            xo +  1.0, yo + -1.0,  zo + 1.0,
+            xo +  1.0, yo +  1.0,  zo + 1.0,
+            xo + -1.0, yo +  1.0,  zo + 1.0,
 
             // Back face
-            -1.0, -1.0, -1.0,
-            -1.0,  1.0, -1.0,
-             1.0,  1.0, -1.0,
-             1.0, -1.0, -1.0,
+            xo + -1.0, yo + -1.0, zo + -1.0,
+            xo + -1.0, yo +  1.0, zo + -1.0,
+            xo +  1.0, yo +  1.0, zo + -1.0,
+            xo +  1.0, yo + -1.0, zo + -1.0,
 
             // Top face
-            -1.0,  1.0, -1.0,
-            -1.0,  1.0,  1.0,
-             1.0,  1.0,  1.0,
-             1.0,  1.0, -1.0,
+            xo + -1.0, yo + 1.0, zo + -1.0,
+            xo + -1.0, yo + 1.0, zo +  1.0,
+            xo +  1.0, yo + 1.0, zo +  1.0,
+            xo +  1.0, yo + 1.0, zo + -1.0,
 
             // Bottom face
-            -1.0, -1.0, -1.0,
-             1.0, -1.0, -1.0,
-             1.0, -1.0,  1.0,
-            -1.0, -1.0,  1.0,
+            xo + -1.0, yo + -1.0, zo + -1.0,
+            xo +  1.0, yo + -1.0, zo + -1.0,
+            xo +  1.0, yo + -1.0, zo +  1.0,
+            xo + -1.0, yo + -1.0, zo +  1.0,
 
             // Right face
-             1.0, -1.0, -1.0,
-             1.0,  1.0, -1.0,
-             1.0,  1.0,  1.0,
-             1.0, -1.0,  1.0,
+            xo +  1.0, yo + -1.0, zo + -1.0,
+            xo +  1.0, yo +  1.0, zo + -1.0,
+            xo +  1.0, yo +  1.0, zo +  1.0,
+            xo +  1.0, yo + -1.0, zo +  1.0,
 
             // Left face
-            -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0,
-            -1.0,  1.0,  1.0,
-            -1.0,  1.0, -1.0
-            ]),
-            gl.STATIC_DRAW
-        );
-        cubePos.itemSize = 3;
-        cubePos.numItems = 24;
+            xo + -1.0, yo + -1.0, zo + -1.0,
+            xo + -1.0, yo + -1.0, zo +  1.0,
+            xo + -1.0, yo +  1.0, zo +  1.0,
+            xo + -1.0, yo +  1.0, zo + -1.0
+            ])
 
-        cubeCol = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeCol);
-        var colors = (function () {
+        cols = cols.concat(function () {
             var colors = [
                     [0.8, 0.0, 0.0, 0.8], // Front face
                     [0.8, 0.8, 0.0, 0.8], // Back face
@@ -154,26 +149,65 @@ var webgl = {
             }
             return unpackedColors;
         }());
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        cubeCol.itemSize = 4;
-        cubeCol.numItems = 24;
 
-        cubeIndex = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIndex);
-        gl.bufferData(
-            gl.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array([
+        indices = indices.concat([
                 0, 1, 2,      0, 2, 3,    // Front face
                 4, 5, 6,      4, 6, 7,    // Back face
                 8, 9, 10,     8, 10, 11,  // Top face
                 12, 13, 14,   12, 14, 15, // Bottom face
                 16, 17, 18,   16, 18, 19, // Right face
                 20, 21, 22,   20, 22, 23  // Left face
-            ]),
+        ].map(function(f){
+            return i * 24 + f;
+        }));
+
+
+        }
+
+        return {
+            verts: verts,
+            colors: cols,
+            indices: indices,
+            cubes: cubes
+        }
+    },
+
+    initBuffers: function () {
+
+        var gl = this.gl,
+            cubePos,
+            cubeCol,
+            cubeIndex,
+            k;
+
+        cubePos = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubePos);
+
+        var chunk = this.getChunk();
+
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array(chunk.verts),
+            gl.STATIC_DRAW
+        );
+        cubePos.itemSize = 3;
+        cubePos.numItems = 24 * chunk.cubes;
+
+        cubeCol = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeCol);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(chunk.colors), gl.STATIC_DRAW);
+        cubeCol.itemSize = 4;
+        cubeCol.numItems = 24 * chunk.cubes;
+
+        cubeIndex = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIndex);
+        gl.bufferData(
+            gl.ELEMENT_ARRAY_BUFFER,
+            new Uint16Array(chunk.indices),
             gl.STATIC_DRAW
         );
         cubeIndex.itemSize = 1;
-        cubeIndex.numItems = 36;
+        cubeIndex.numItems = 36 * chunk.cubes;
 
         this.cube = {
             pos: cubePos,
@@ -219,9 +253,9 @@ var webgl = {
 
         // Translate
         tmp = id.slice(0);
-        tmp[12] = (Math.sin(Date.now() / 1000) * 2);
+        tmp[12] = -10;//-10 *(Math.sin(Date.now() / 1000) * 2);
         tmp[13] = 0.2;
-        tmp[14] = 5 * -1;
+        tmp[14] = 30 * -1;
         out = matrix.mult(out, tmp);
 
         gl.uniformMatrix4fv(prog.pMatrixUniform, false, matrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 1000.0));
