@@ -18,7 +18,7 @@ var webgl = {
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, 0.5);
         gl.enable(gl.DEPTH_TEST);
     },
 
@@ -55,7 +55,7 @@ var webgl = {
                 varying vec4 vColor;\
                 \
                 void main(void) {\
-                    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\
+                    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 0.5);\
                     vColor = aVertexColor;\
                 }\
                 ";
@@ -89,46 +89,46 @@ var webgl = {
 
         for (var i = 0; i < cubes; i++) {
 
-            var xo = (i % (cubes / 10) | 0) * 2,
-                yo = (i / (cubes / 10) | 0) * 2,
-                zo = (Math.random() * 20 | 0) * 2;
+            var xo = i % (cubes / 10) | 0,
+                yo = i / (cubes / 10) | 0,
+                zo = Math.random() * 20 | 0;
 
         verts = verts.concat([
                 // Front face
-            xo + -1.0, yo + -1.0,  zo + 1.0,
-            xo +  1.0, yo + -1.0,  zo + 1.0,
-            xo +  1.0, yo +  1.0,  zo + 1.0,
-            xo + -1.0, yo +  1.0,  zo + 1.0,
+            xo + -0.5, yo + -0.5,  zo + 0.5,
+            xo +  0.5, yo + -0.5,  zo + 0.5,
+            xo +  0.5, yo +  0.5,  zo + 0.5,
+            xo + -0.5, yo +  0.5,  zo + 0.5,
 
             // Back face
-            xo + -1.0, yo + -1.0, zo + -1.0,
-            xo + -1.0, yo +  1.0, zo + -1.0,
-            xo +  1.0, yo +  1.0, zo + -1.0,
-            xo +  1.0, yo + -1.0, zo + -1.0,
+            xo + -0.5, yo + -0.5, zo + -0.5,
+            xo + -0.5, yo +  0.5, zo + -0.5,
+            xo +  0.5, yo +  0.5, zo + -0.5,
+            xo +  0.5, yo + -0.5, zo + -0.5,
 
             // Top face
-            xo + -1.0, yo + 1.0, zo + -1.0,
-            xo + -1.0, yo + 1.0, zo +  1.0,
-            xo +  1.0, yo + 1.0, zo +  1.0,
-            xo +  1.0, yo + 1.0, zo + -1.0,
+            xo + -0.5, yo + 0.5, zo + -0.5,
+            xo + -0.5, yo + 0.5, zo +  0.5,
+            xo +  0.5, yo + 0.5, zo +  0.5,
+            xo +  0.5, yo + 0.5, zo + -0.5,
 
             // Bottom face
-            xo + -1.0, yo + -1.0, zo + -1.0,
-            xo +  1.0, yo + -1.0, zo + -1.0,
-            xo +  1.0, yo + -1.0, zo +  1.0,
-            xo + -1.0, yo + -1.0, zo +  1.0,
+            xo + -0.5, yo + -0.5, zo + -0.5,
+            xo +  0.5, yo + -0.5, zo + -0.5,
+            xo +  0.5, yo + -0.5, zo +  0.5,
+            xo + -0.5, yo + -0.5, zo +  0.5,
 
             // Right face
-            xo +  1.0, yo + -1.0, zo + -1.0,
-            xo +  1.0, yo +  1.0, zo + -1.0,
-            xo +  1.0, yo +  1.0, zo +  1.0,
-            xo +  1.0, yo + -1.0, zo +  1.0,
+            xo +  0.5, yo + -0.5, zo + -0.5,
+            xo +  0.5, yo +  0.5, zo + -0.5,
+            xo +  0.5, yo +  0.5, zo +  0.5,
+            xo +  0.5, yo + -0.5, zo +  0.5,
 
             // Left face
-            xo + -1.0, yo + -1.0, zo + -1.0,
-            xo + -1.0, yo + -1.0, zo +  1.0,
-            xo + -1.0, yo +  1.0, zo +  1.0,
-            xo + -1.0, yo +  1.0, zo + -1.0
+            xo + -0.5, yo + -0.5, zo + -0.5,
+            xo + -0.5, yo + -0.5, zo +  0.5,
+            xo + -0.5, yo +  0.5, zo +  0.5,
+            xo + -0.5, yo +  0.5, zo + -0.5
             ])
 
         cols = cols.concat(function () {
