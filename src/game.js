@@ -6,10 +6,17 @@ var game = {
 
     init: function () {
 
-        webgl.init(document.querySelector("#board"))
+        webgl.init(document.querySelector("#board"));
+
+        this.makeAChunk();
 
         this.run();
+    },
 
+    makeAChunk: function () {
+        this.chunk = new Chunk().init();
+        this.chunk.buffers = webgl.getBuffers(this.chunk.mesh);
+        delete this.chunk.mesh;
     },
 
     run: function () {
@@ -29,11 +36,14 @@ var game = {
 
     tick: function (dt) {
 
+        if (Math.random() < 0.02) {
+            //this.makeAChunk();
+        }
     },
 
     render: function (dt) {
 
-        webgl.render();
+        webgl.render(this.chunk.buffers);
 
     }
 }
