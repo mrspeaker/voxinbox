@@ -107,13 +107,15 @@ var webgl = {
         }
     },
 
-    render: function (buffers) {
+    render: function (bufferss) {
 
         var gl = this.gl,
             prog = this.shaderProgram;
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        bufferss.forEach(function (buffers) {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.verts);
         gl.vertexAttribPointer(prog.vertexPositionAttribute, buffers.verts.size, gl.FLOAT, false, 0, 0);
@@ -154,6 +156,8 @@ var webgl = {
         gl.uniformMatrix4fv(prog.mvMatrixUniform, false, out);
 
         gl.drawElements(gl.TRIANGLES, buffers.indices.items, gl.UNSIGNED_SHORT, 0);
+
+    });
 
     }
 };

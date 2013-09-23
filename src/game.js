@@ -8,15 +8,9 @@ var game = {
 
         webgl.init(document.querySelector("#board"));
 
-        this.makeAChunk();
+        this.chunks = Chunks.init(webgl);
 
         this.run();
-    },
-
-    makeAChunk: function () {
-        this.chunk = new Chunk().init();
-        this.chunk.buffers = webgl.getBuffers(this.chunk.mesh);
-        delete this.chunk.mesh;
     },
 
     run: function () {
@@ -43,7 +37,7 @@ var game = {
 
     render: function (dt) {
 
-        webgl.render(this.chunk.buffers);
+        this.chunks.render(webgl);
 
     }
 }
