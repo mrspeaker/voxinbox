@@ -130,15 +130,24 @@ var webgl = {
             tmp = id.slice(0),
             rot = 0;
 
-        var X = (Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
+        var X = -1.1;//(Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
         tmp[5] = Math.cos(X);
         tmp[6] = Math.sin(X);
         tmp[9] = -1 * Math.sin(X);
         tmp[10] = Math.cos(X);
         out = matrix.mult(out, tmp);
 
+         //Rotating Y
         tmp = id.slice(0);
-        var Z = (Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
+        var Y = 0;//-(Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
+        tmp[0] = Math.cos(Y);
+        tmp[2] = -1 * Math.sin(Y);
+        tmp[8] = Math.sin(Y);
+        tmp[10] = Math.cos(Y);
+        out = matrix.mult(out, tmp);
+
+        tmp = id.slice(0);
+        var Z = 0;////(Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
         tmp[0] = Math.cos(Z);
         tmp[1] = Math.sin(Z);
         tmp[4] = -1 * Math.sin(Z);
@@ -147,9 +156,9 @@ var webgl = {
 
         // Translate
         tmp = id.slice(0);
-        tmp[12] = -10;
-        tmp[13] = 0.2;
-        tmp[14] = 150 * -1;
+        tmp[12] = -50;
+        tmp[13] = -20;
+        tmp[14] = 50 * -1;
         out = matrix.mult(out, tmp);
 
         gl.uniformMatrix4fv(prog.pMatrixUniform, false, matrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 1000.0));

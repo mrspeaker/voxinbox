@@ -6,6 +6,10 @@ var game = {
 
     init: function () {
 
+        this.simplex = new SimplexNoise();
+        //console.log(this.simplex.noise2D(100, 20))
+        //console.log(this.simplex.noise3D(0.1, 0.2, 0.3));
+
         webgl.init(document.querySelector("#board"));
 
         this.chunks = Chunks.init(webgl);

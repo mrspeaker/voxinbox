@@ -19,18 +19,24 @@ Chunk.prototype = {
             this.blocks.push([]);
             for (var y = 0; y < this.CHUNK_SIZE; y++) {
                 this.blocks[x].push([]);
+                var value2d = game.simplex.noise2D((this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE, (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE);
+                value2d = (value2d + 0.5) * 0.5;
+
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {
                     this.blocks[x][y][z] = new Block();
 
-                    //this.blocks[x][y][z].isActive = true;
-                    if (Math.sqrt(
+                    if (z / this.CHUNK_SIZE < value2d) {
+                        this.blocks[x][y][z].isActive = true;
+                    }
+                    /*if (Math.sqrt(
                         (x - rad) * (x - rad) +
                         (y - rad) * (y - rad) +
                         (z - rad) * (z - rad)) <= rad) {
                         //if ( Math.random() < 0.1 ) {
                             this.blocks[x][y][z].isActive = true;
                         //}
-                    }
+                    }*/
+
                 }
             }
         }
@@ -139,12 +145,12 @@ Chunk.prototype = {
 
         cols = (function () {
             var colors = [
-                    [0.8, 0.0, 0.0, 0.8], // Front face
-                    [0.8, 0.8, 0.0, 0.8], // Back face
-                    [0.0, 0.8, 0.0, 0.8], // Top face
-                    [0.8, 0.5, 0.5, 0.8], // Bottom face
-                    [0.8, 0.0, 0.8, 0.8], // Right face
-                    [0.0, 0.0, 0.8, 0.8]  // Left face
+                    [72/255, 163/255, 65/255, 1.0], // Front face
+                    [0.8, 0.8, 0.0, 1.0], // Back face
+                    [145/255, 97/255, 48/255, 1.0], // Top face
+                    [145/255, 97/255, 48/255, 1.0], // Bottom face
+                    [115/255, 67/255, 18/255, 1.0], // Right face
+                    [115/255, 67/255, 18/255, 1.0]  // Left face
                 ],
                 unpackedColors = [];
             for (var i in colors) {

@@ -1,7 +1,7 @@
 var Chunks = {
-    xrange: 4,
-    yrange: 4,
-    zrange: 3,
+    xrange: 3,
+    yrange: 3,
+    zrange: 1,
 
     chunks: null,
 
