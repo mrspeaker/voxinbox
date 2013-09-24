@@ -13,6 +13,8 @@ var webgl = {
         if (!gl) {
             throw new Error("Sorry, no webgl.");
         }
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
 
@@ -54,7 +56,15 @@ var webgl = {
                 \
                 void main(void) {\
                     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 0.5);\
-                    vColor = aVertexColor;\
+                    vec4 fog_color = vec4(0.13, 0.13, 0.03, 1.0);\
+                    float fog;\
+                    float fog_coord;\
+                    float fog_end = 120.0;\
+                    fog_coord = abs(gl_Position.z);\
+                    fog_coord = clamp(fog_coord, 0.0, fog_end);\
+                    fog = (fog_end - fog_coord) / fog_end;\
+                    fog = clamp(fog, 0.0, 1.0);\
+                    vColor = mix(fog_color, aVertexColor, fog);\
                 }\
                 ";
         prog = gl.createProgram();
@@ -107,7 +117,7 @@ var webgl = {
         }
     },
 
-    render: function (bufferss) {
+    render: function (bufferss, camera) {
 
         var gl = this.gl,
             prog = this.shaderProgram;
@@ -115,58 +125,21 @@ var webgl = {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+        gl.uniformMatrix4fv(prog.pMatrixUniform, false, matrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 1000.0));
+        gl.uniformMatrix4fv(prog.mvMatrixUniform, false, camera.getTransforms());
+
         bufferss.forEach(function (buffers) {
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.verts);
-        gl.vertexAttribPointer(prog.vertexPositionAttribute, buffers.verts.size, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.verts);
+            gl.vertexAttribPointer(prog.vertexPositionAttribute, buffers.verts.size, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
-        gl.vertexAttribPointer(prog.vertexColorAttribute, buffers.colors.size, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
+            gl.vertexAttribPointer(prog.vertexColorAttribute, buffers.colors.size, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+            gl.drawElements(gl.TRIANGLES, buffers.indices.items, gl.UNSIGNED_SHORT, 0);
 
-        var id = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-            out = id.slice(0)
-            tmp = id.slice(0),
-            rot = 0;
-
-        var X = -1.1;//(Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
-        tmp[5] = Math.cos(X);
-        tmp[6] = Math.sin(X);
-        tmp[9] = -1 * Math.sin(X);
-        tmp[10] = Math.cos(X);
-        out = matrix.mult(out, tmp);
-
-         //Rotating Y
-        tmp = id.slice(0);
-        var Y = 0;//-(Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
-        tmp[0] = Math.cos(Y);
-        tmp[2] = -1 * Math.sin(Y);
-        tmp[8] = Math.sin(Y);
-        tmp[10] = Math.cos(Y);
-        out = matrix.mult(out, tmp);
-
-        tmp = id.slice(0);
-        var Z = 0;////(Date.now() / 20 % 360 | 0) * (Math.PI / 180.0);
-        tmp[0] = Math.cos(Z);
-        tmp[1] = Math.sin(Z);
-        tmp[4] = -1 * Math.sin(Z);
-        tmp[5] = Math.cos(Z);
-        out = matrix.mult(out, tmp);
-
-        // Translate
-        tmp = id.slice(0);
-        tmp[12] = -50;
-        tmp[13] = -20;
-        tmp[14] = 50 * -1;
-        out = matrix.mult(out, tmp);
-
-        gl.uniformMatrix4fv(prog.pMatrixUniform, false, matrix.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 1000.0));
-        gl.uniformMatrix4fv(prog.mvMatrixUniform, false, out);
-
-        gl.drawElements(gl.TRIANGLES, buffers.indices.items, gl.UNSIGNED_SHORT, 0);
-
-    });
+        });
 
     }
 };

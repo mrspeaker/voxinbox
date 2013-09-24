@@ -1,6 +1,6 @@
 var Chunks = {
-    xrange: 3,
-    yrange: 3,
+    xrange: 5,
+    yrange: 5,
     zrange: 1,
 
     chunks: null,
@@ -25,9 +25,9 @@ var Chunks = {
     tick: function () {
 
     },
-    render: function (gl) {
+    render: function (gl, camera) {
 
-        gl.render(this.chunks);
+        gl.render(this.chunks, camera);
 
     }
 };

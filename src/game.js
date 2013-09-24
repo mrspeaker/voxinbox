@@ -6,9 +6,21 @@ var game = {
 
     init: function () {
 
+        this.input = Input.init();
+        this.input.bind({
+            "left": "left",
+            "right": "right",
+            "up": "up",
+            "down": "down",
+            "forward": "w",
+            "backward": "s",
+            "strafe_left": "a",
+            "strafe_right": "d"
+
+        });
+
+        this.camera = new Camera().init();
         this.simplex = new SimplexNoise();
-        //console.log(this.simplex.noise2D(100, 20))
-        //console.log(this.simplex.noise3D(0.1, 0.2, 0.3));
 
         webgl.init(document.querySelector("#board"));
 
@@ -34,14 +46,14 @@ var game = {
 
     tick: function (dt) {
 
-        if (Math.random() < 0.02) {
-            //this.makeAChunk();
-        }
+        this.input.tick();
+        this.camera.tick(this.input);
+
     },
 
     render: function (dt) {
 
-        this.chunks.render(webgl);
+        this.chunks.render(webgl, this.camera);
 
     }
 }
