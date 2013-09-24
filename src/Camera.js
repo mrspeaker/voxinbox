@@ -102,11 +102,12 @@ Camera.prototype = {
         }
 
         if (Input.isDown("forward")) {
-            this.pos.Y -= speed;
+            this.pos.X -= speed * Math.sin(this.rotation.Y * (Math.PI / 180.0));
+            this.pos.Y -= speed * Math.cos(this.rotation.Y * (Math.PI / 180.0));
         }
         if (Input.isDown("backward")) {
-
-            this.pos.Y += speed;
+            this.pos.X += speed * Math.sin(this.rotation.Y * (Math.PI / 180.0));
+            this.pos.Y += speed * Math.cos(this.rotation.Y * (Math.PI / 180.0));
         }
         if (Input.isDown("strafe_left")) {
             this.pos.X += speed;
