@@ -39,11 +39,19 @@ Camera.prototype = {
             out = id.slice(0);
 
         //Scaling
-        var tmp = id.slice(0);
-        tmp[0] *= this.scale.X;
-        tmp[5] *= this.scale.Y;
-        tmp[10] *= this.scale.Z;
-        out = matrix.mult(out, tmp);
+        // var tmp = id.slice(0);
+        // tmp[0] *= this.scale.X;
+        // tmp[5] *= this.scale.Y;
+        // tmp[10] *= this.scale.Z;
+        // out = matrix.mult(out, tmp);
+
+        //Moving
+        tmp = id.slice(0);
+        tmp[12] = this.pos.X;
+        tmp[13] = this.pos.Y;
+        tmp[14] = this.pos.Z * -1;
+
+        out =  matrix.mult(out, tmp);
 
         //Rotating X
         tmp = id.slice(0);
@@ -72,19 +80,13 @@ Camera.prototype = {
         tmp[5] = Math.cos(Z);
         out = matrix.mult(out, tmp);
 
-        //Moving
-        tmp = id.slice(0);
-        tmp[12] = this.pos.X;
-        tmp[13] = this.pos.Y;
-        tmp[14] = this.pos.Z * -1;
-
-        return matrix.mult(out, tmp);
+        return out;
 
     },
 
     tick: function (input) {
 
-        var speed = 0.4;
+        var speed = 1.4;
 
         if (Input.isDown("left")) {
             this.rotation.Y -= speed;
@@ -93,17 +95,18 @@ Camera.prototype = {
             this.rotation.Y += speed;
         }
         if (Input.isDown("up")) {
-            this.pos.Y -= speed;
+            this.pos.Z += speed;
         }
         if (Input.isDown("down")) {
-            this.pos.Y += speed;
+            this.pos.Z -= speed;
         }
 
         if (Input.isDown("forward")) {
-            this.pos.Z -= speed;
+            this.pos.Y -= speed;
         }
         if (Input.isDown("backward")) {
-            this.pos.Z += speed;
+
+            this.pos.Y += speed;
         }
         if (Input.isDown("strafe_left")) {
             this.pos.X += speed;

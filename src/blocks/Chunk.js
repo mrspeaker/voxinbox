@@ -19,7 +19,10 @@ Chunk.prototype = {
             this.blocks.push([]);
             for (var y = 0; y < this.CHUNK_SIZE; y++) {
                 this.blocks[x].push([]);
-                var value2d = game.simplex.noise2D((this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 2, (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 2);
+                var value2d = game.simplex.noise3D(
+                    (this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 3,
+                    (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 3,
+                    (this.off[2] * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 3);
                 value2d = (value2d + 0.5) * 0.5;
 
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {

@@ -57,16 +57,11 @@ var webgl = {
                 void main(void) {\
                     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 0.5);\
                     vec4 fog_color = vec4(0.13, 0.13, 0.03, 1.0);\
-                    float fog;\
-                    float fog_coord;\
-                    float fog_end = 120.0;\
-                    fog_coord = abs(gl_Position.z);\
-                    fog_coord = clamp(fog_coord, 0.0, fog_end);\
-                    fog = (fog_end - fog_coord) / fog_end;\
-                    fog = clamp(fog, 0.0, 1.0);\
+                    float fog_end = 100.0;\
+                    float fog_coord = clamp(abs(gl_Position.z), 0.0, fog_end);\
+                    float fog = clamp((fog_end - fog_coord) / fog_end, 0.0, 1.0);\
                     vColor = mix(fog_color, aVertexColor, fog);\
-                }\
-                ";
+                }";
         prog = gl.createProgram();
         gl.attachShader(prog, this.compile(vs, false));
         gl.attachShader(prog, this.compile(fs, true));
