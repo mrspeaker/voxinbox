@@ -84,37 +84,15 @@ Camera.prototype = {
 
     },
 
-    tick: function (input) {
+    tick: function (target) {
 
-        var speed = 1.4;
+        this.pos.X = target.pos.x;
+        this.pos.Y = target.pos.y;
+        this.pos.Z = target.pos.z;
 
-        if (Input.isDown("left")) {
-            this.rotation.Y -= speed;
-        }
-        if (Input.isDown("right")) {
-            this.rotation.Y += speed;
-        }
-        if (Input.isDown("up")) {
-            this.pos.Z += speed;
-        }
-        if (Input.isDown("down")) {
-            this.pos.Z -= speed;
-        }
-
-        if (Input.isDown("forward")) {
-            this.pos.X -= speed * Math.sin(this.rotation.Y * (Math.PI / 180.0));
-            this.pos.Y -= speed * Math.cos(this.rotation.Y * (Math.PI / 180.0));
-        }
-        if (Input.isDown("backward")) {
-            this.pos.X += speed * Math.sin(this.rotation.Y * (Math.PI / 180.0));
-            this.pos.Y += speed * Math.cos(this.rotation.Y * (Math.PI / 180.0));
-        }
-        if (Input.isDown("strafe_left")) {
-            this.pos.X += speed;
-        }
-        if (Input.isDown("strafe_right")) {
-            this.pos.X -= speed;
-        }
+        this.rotation.X = target.rotation.x;
+        this.rotation.Y = target.rotation.y;
+        this.rotation.Z = target.rotation.z;
 
     }
 

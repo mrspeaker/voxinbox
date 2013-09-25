@@ -34,8 +34,7 @@ Chunk.prototype = {
             }
         }
 
-        var toHide = [],
-            toShow = [];
+        var toHide = [];
         for (var x = 1; x < this.CHUNK_SIZE - 2; x++) {
             this.blocks.push([]);
             for (var y = 1; y < this.CHUNK_SIZE - 2; y++) {
@@ -52,8 +51,6 @@ Chunk.prototype = {
                             this.blocks[x][y][z - 1].isActive
                         ) {
                             toHide.push(block);
-                        } else {
-                            toShow.push(block);
                         }
                     }
                 }
@@ -70,13 +67,24 @@ Chunk.prototype = {
             indices: [],
             colors: []
         };
-        var cubeid = 0;
+        var cubeid = 0,
+            total = 0;
         for (var x = 0; x < this.CHUNK_SIZE; x++) {
             for (var y = 0; y < this.CHUNK_SIZE; y++) {
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {
                     var block = this.blocks[x][y][z];
                     if (block.isActive) {
-                        var cube = this.createCube(block, xo + x, yo + y, zo + z, cubeid);
+                        total++;
+                    }
+                }
+            }
+        }
+        for (var x = 0; x < this.CHUNK_SIZE; x++) {
+            for (var y = 0; y < this.CHUNK_SIZE; y++) {
+                for (var z = 0; z < this.CHUNK_SIZE; z++) {
+                    var block = this.blocks[x][y][z];
+                    if (block.isActive) {
+                        var cube = this.createCube(block, xo + x, yo + y, zo + z, cubeid, total);
                         cube.verts.forEach(function (v) {
                             this.mesh.verts.push(v);
                         }, this);
@@ -93,7 +101,7 @@ Chunk.prototype = {
         }
     },
 
-    createCube: function (block, xo, yo, zo, id) {
+    createCube: function (block, xo, yo, zo, id, total) {
         var verts = [],
             cols = [],
             indices = [];
@@ -137,14 +145,23 @@ Chunk.prototype = {
             ];
 
         cols = (function () {
-            var dark = (Math.random() * 30 - 15) | 0;
-            var colors = [
-                    [(72 + dark)/255, (163 + dark)/255, (65 + dark)/255, 1.0], // Front face
-                    [0.4, 0.4, 0.2, 1.0], // Back face
-                    [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Top face
-                    [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Bottom face
-                    [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0], // Right face
-                    [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0]  // Left face
+            // var dark = (Math.random() * 30 - 15) | 0,
+            //     colors = [
+            //         [(72 + dark)/255, (163 + dark)/255, (65 + dark)/255, 1.0], // Front face
+            //         [0.4, 0.4, 0.2, 1.0], // Back face
+            //         [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Top face
+            //         [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Bottom face
+            //         [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0], // Right face
+            //         [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0]  // Left face
+            //     ],
+            var dark = id / total,
+                colors = [
+                    [dark, 0.0, 0.0, 1.0], // Front face
+                    [dark, 0.0, 0.0, 1.0], // Back face
+                    [0.0, dark, 0.0, 1.0], // Top face
+                    [0.0, 0.0, dark, 1.0], // Bottom face
+                    [dark, dark, 0.0, 1.0], // Right face
+                    [0.0, dark, dark, 1.0]  // Left face
                 ],
                 unpackedColors = [];
             for (var i in colors) {

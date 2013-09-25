@@ -15,18 +15,23 @@ var game = {
             "forward": "w",
             "backward": "s",
             "strafe_left": "a",
-            "strafe_right": "d"
+            "strafe_right": "d",
+            "fire": "space"
 
         });
 
         this.camera = new Camera().init();
         this.simplex = new SimplexNoise();
+        this.player = new Player().init(-10, -10, 15);
 
         webgl.init(document.querySelector("#board"));
 
         this.chunks = Chunks.init(webgl);
+        var self = this;
+        setTimeout(function () {
+            self.run();
+        }, 1000);
 
-        this.run();
     },
 
     run: function () {
@@ -46,8 +51,8 @@ var game = {
 
     tick: function (dt) {
 
-        this.input.tick();
-        this.camera.tick(this.input);
+        this.player.tick(this.input.tick(), this.chunks);
+        this.camera.tick(this.player);
 
     },
 
