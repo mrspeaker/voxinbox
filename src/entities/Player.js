@@ -6,7 +6,7 @@ function Player() {
     this.acceleration = null;
 
     this.speed = 0.3;
-    this.gravity = {x:0, y:0, z:-9.8 * 0.75};
+    this.gravity = {x:0, y:0, z:-9.8 * 0.7};
 
     this.falling = false;
     this.jumpSpeed = 0;
@@ -74,7 +74,10 @@ Player.prototype = {
             if (block.isActive) {
                 this.falling = false;
                 moves.z = 0;
-                if (this.velocity.z < 0) this.velocity.z = 0;
+                if (this.velocity.z < 0) {
+                    this.velocity.z = 0;
+                    this.acceleration.z = 0;
+                }
             } else {
                 this.falling = true;
                 /*if (worldPos[1] > 0) {
@@ -86,6 +89,12 @@ Player.prototype = {
             }
         }
 
+        if(this.velocity.z > 3) {
+            this.velocity.z > 3;
+        }
+        if (this.velocity.z < -3) {
+            this.velocity.z  = -3;
+        }
 
         this.pos.x += moves.x;
         this.pos.y += moves.y;
@@ -101,14 +110,14 @@ Player.prototype = {
             zo = 0;
 
         if (Input.isDown("left")) {
-            this.rotation.y -= speed * 3;
+            this.rotation.y -= speed * 3.5;
         }
         if (Input.isDown("right")) {
-            this.rotation.y += speed * 3;
+            this.rotation.y += speed * 3.5;
         }
 
         if (Input.isDown("forward")) { // move up
-            this.acceleration.z = 11 * dt;
+            this.acceleration.z = 8 * dt;
         }
         if (Input.isDown("backward")) {
             zo -= speed;
@@ -129,10 +138,9 @@ Player.prototype = {
             xo -= speed;
         }
 
-        if (Input.pressed("fire")) {
+        if (Input.isDown("fire")) {
             if (!this.falling) {
                 this.jump();
-                this.zo += speed;
             }
         }
 
@@ -144,9 +152,7 @@ Player.prototype = {
     },
 
     jump: function () {
-        this.jumpSpeed = 4;
-        this.acceleration.z += 2;
-        this.falling = true;
+        this.acceleration.z += 1.5;
     }
 
 

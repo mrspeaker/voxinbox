@@ -88,7 +88,7 @@ Camera.prototype = {
 
         this.pos.X = target.pos.x;
         this.pos.Y = target.pos.y;
-        this.pos.Z = target.pos.z;
+        this.pos.Z = target.pos.z + 1.4;
 
         this.rotation.X = target.rotation.x;
         this.rotation.Y = target.rotation.y;
