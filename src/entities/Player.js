@@ -2,15 +2,19 @@ function Player() {
     this.pos = null;
     this.rotation = null;
 
-    this.speed = 0.9;
-    this.gravity = 0.1;
-    this.falling = false;
+    this.velocity = null;
+    this.acceleration = null;
 
+    this.speed = 0.3;
+    this.gravity = {x:0, y:0, z:-9.8 * 0.75};
+
+    this.falling = false;
     this.jumpSpeed = 0;
 
 };
 Player.prototype = {
     init: function (x, y, z) {
+
         this.pos = {
             x: x,
             y: y,
@@ -23,20 +27,26 @@ Player.prototype = {
             z: 0
         };
 
+        this.velocity = { x: 0, y: 0, z: 0 };
+        this.acceleration = { x: 0, y: 0, z: 0 };
+
         return this;
     },
 
-    tick: function (input, chunks) {
+    tick: function (dt, input, chunks) {
 
-        var moves = this.tickInput(input);
+        var moves = this.tickInput(dt, input);
+
+        this.velocity.z += this.acceleration.z;
 
         if (this.falling) {
-            moves.z -= this.gravity;
-            if (this.jumpSpeed > 0) {
-                moves.z += this.jumpSpeed;
-                this.jumpSpeed -= 0.5;
-            }
+
+            this.velocity.z += this.gravity.z * dt;
+
+            moves.z = this.velocity.z;
+
         }
+        this.acceleration.z = 0;
 
         var worldPos = [
                 Math.floor((-this.pos.x) / 2),
@@ -48,8 +58,12 @@ Player.prototype = {
         if (inWorld) {
             var chunk = chunks.chunks[chunkPos[0]][chunkPos[1]][chunkPos[2]];
             if (!chunk) {
-                console.error(chunkPos, chunks);
-                throw new Error("no chunk");
+                //console.error(chunkPos, chunks);
+                 this.pos.x += moves.x;
+                this.pos.y += moves.y;
+                this.pos.z += moves.z;
+                return;
+                //throw new Error("no chunk");
             }
             var block = chunk.blocks[worldPos[0] % chunks.CHUNK_SIZE][worldPos[1] % chunks.CHUNK_SIZE][worldPos[2] % chunks.CHUNK_SIZE];
             if (!block) {
@@ -58,15 +72,17 @@ Player.prototype = {
             }
 
             if (block.isActive) {
-                falling = false;
+                this.falling = false;
                 moves.z = 0;
+                if (this.velocity.z < 0) this.velocity.z = 0;
             } else {
-                if (worldPos[1] > 0) {
-                    var footBlock = chunk.blocks[worldPos[0] % chunks.CHUNK_SIZE][(worldPos[1] - 1) % chunks.CHUNK_SIZE][worldPos[2] % chunks.CHUNK_SIZE];
+                this.falling = true;
+                /*if (worldPos[1] > 0) {
+                    var footBlock = chunk.blocks[worldPos[0] % chunks.CHUNK_SIZE][(worldPos[1] - 1) % chunks.CHUNK_SIZE][Math.floor((this.pos.z + moves.z) / 2) % chunks.CHUNK_SIZE];
                     if (!footBlock.isActive) {
                         this.falling = true;
                     }
-                }
+                }*/
             }
         }
 
@@ -77,7 +93,7 @@ Player.prototype = {
 
     },
 
-    tickInput: function (input) {
+    tickInput: function (dt, input) {
 
         var speed = this.speed,
             xo = 0,
@@ -85,14 +101,14 @@ Player.prototype = {
             zo = 0;
 
         if (Input.isDown("left")) {
-            this.rotation.y -= speed;
+            this.rotation.y -= speed * 3;
         }
         if (Input.isDown("right")) {
-            this.rotation.y += speed;
+            this.rotation.y += speed * 3;
         }
 
         if (Input.isDown("forward")) { // move up
-            zo += speed;
+            this.acceleration.z = 11 * dt;
         }
         if (Input.isDown("backward")) {
             zo -= speed;
@@ -113,10 +129,10 @@ Player.prototype = {
             xo -= speed;
         }
 
-        if (Input.isDown("fire")) {
-            console.log(this.falling);
+        if (Input.pressed("fire")) {
             if (!this.falling) {
                 this.jump();
+                this.zo += speed;
             }
         }
 
@@ -128,7 +144,8 @@ Player.prototype = {
     },
 
     jump: function () {
-        this.jumpSpeed = 6;
+        this.jumpSpeed = 4;
+        this.acceleration.z += 2;
         this.falling = true;
     }
 

@@ -20,9 +20,9 @@ Chunk.prototype = {
             for (var y = 0; y < this.CHUNK_SIZE; y++) {
                 this.blocks[x].push([]);
                 var value2d = game.simplex.noise3D(
-                    (this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 3,
-                    (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 3,
-                    (this.off[2] * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 3);
+                    (this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 5,
+                    (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 5,
+                    (this.off[2] * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 5);
                 value2d = (value2d + 0.5) * 0.5;
 
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {
@@ -145,24 +145,24 @@ Chunk.prototype = {
             ];
 
         cols = (function () {
-            // var dark = (Math.random() * 30 - 15) | 0,
-            //     colors = [
-            //         [(72 + dark)/255, (163 + dark)/255, (65 + dark)/255, 1.0], // Front face
-            //         [0.4, 0.4, 0.2, 1.0], // Back face
-            //         [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Top face
-            //         [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Bottom face
-            //         [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0], // Right face
-            //         [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0]  // Left face
-            //     ],
-            var dark = id / total,
+            var dark = (Math.random() * 30 - 15) | 0,
                 colors = [
-                    [dark, 0.0, 0.0, 1.0], // Front face
-                    [dark, 0.0, 0.0, 1.0], // Back face
-                    [0.0, dark, 0.0, 1.0], // Top face
-                    [0.0, 0.0, dark, 1.0], // Bottom face
-                    [dark, dark, 0.0, 1.0], // Right face
-                    [0.0, dark, dark, 1.0]  // Left face
+                    [(72 + dark)/255, (163 + dark)/255, (65 + dark)/255, 1.0], // Front face
+                    [0.4, 0.4, 0.2, 1.0], // Back face
+                    [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Top face
+                    [(145 + dark)/255, (97 + dark)/255, (48 + dark)/255, 1.0], // Bottom face
+                    [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0], // Right face
+                    [(105 + dark)/255, (57 + dark)/255, (8 + dark)/255, 1.0]  // Left face
                 ],
+            // var dark = id / total,
+            //     colors = [
+            //         [dark, 0.0, 0.0, 1.0], // Front face
+            //         [dark, 0.0, 0.0, 1.0], // Back face
+            //         [0.0, dark, 0.0, 1.0], // Top face
+            //         [0.0, 0.0, dark, 1.0], // Bottom face
+            //         [dark, dark, 0.0, 1.0], // Right face
+            //         [0.0, dark, dark, 1.0]  // Left face
+            //     ],
                 unpackedColors = [];
             for (var i in colors) {
                 var color = colors[i];

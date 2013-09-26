@@ -27,10 +27,7 @@ var game = {
         webgl.init(document.querySelector("#board"));
 
         this.chunks = Chunks.init(webgl);
-        var self = this;
-        setTimeout(function () {
-            self.run();
-        }, 1000);
+        this.run();
 
     },
 
@@ -51,8 +48,9 @@ var game = {
 
     tick: function (dt) {
 
-        this.player.tick(this.input.tick(), this.chunks);
+        this.player.tick(dt, this.input, this.chunks);
         this.camera.tick(this.player);
+        this.input.tick()
 
     },
 

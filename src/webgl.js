@@ -13,8 +13,8 @@ var webgl = {
         if (!gl) {
             throw new Error("Sorry, no webgl.");
         }
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth - 10;
+        canvas.height = window.innerHeight  -10;
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
 
