@@ -4,6 +4,8 @@ var game = {
     dt: 0,
     last: null,
 
+    msg: "",
+
     init: function () {
 
         this.input = Input.init();
@@ -78,9 +80,9 @@ var game = {
         c.clearRect(0, 0, c.canvas.width, c.canvas.height);
         c.fillStyle = "#fff";
         c.fillText(
-            "p: " + this.player.pos.x.toFixed(2) +
-            " " + this.player.pos.z.toFixed(2) +
-            " " + this.player.pos.y.toFixed(2),
+            "p: " + this.player.pos.x.toFixed(1) +
+            " " + this.player.pos.z.toFixed(1) +
+            " " + this.player.pos.y.toFixed(1),
             10,
             15
         );
@@ -92,6 +94,8 @@ var game = {
         );
 
         c.fillText("r: " + this.player.rotation.y.toFixed(2), 10, 45)
+
+        this.msg && c.fillText(this.msg, 10, 60);
 
     }
 }

@@ -7,6 +7,11 @@ Chunk.prototype = {
 
     init: function (y, x, z) {
         this.off = [y, x, z];
+        this.chunkOffs = {
+            x: x * this.CHUNK_SIZE,
+            y: y * this.CHUNK_SIZE,
+            z: z * this.CHUNK_SIZE
+        };
         this.createChunk();
         this.createMesh(y * this.CHUNK_SIZE, x * this.CHUNK_SIZE, z * this.CHUNK_SIZE);
         return this;
@@ -39,6 +44,10 @@ Chunk.prototype = {
                         if (x === 1 && z  === 0) {
                             this.blocks[y][x][z].isActive = true;
                         }
+                    }
+
+                    if (y === 1 && Math.random() < 0.01) {
+                            this.blocks[y][x][z].isActive = true;
                     }
                 }
             }

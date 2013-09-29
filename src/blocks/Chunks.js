@@ -13,18 +13,21 @@ var Chunks = {
 
     init: function (gl) {
 
-        this.chunks = [];
+        this.chunks = {};
         this.buffers = [];
 
         for (var y = this.ys; y < this.ye; y++) {
-            this.chunks.push([]);
+            this.chunks[y] = {};
             for (var x = this.xs; x < this.xe; x++) {
-                this.chunks[this.chunks.length - 1].push([]);
+
+                this.chunks[y][x] = {};
+
                 for (var z = this.zs; z < this.ze; z++) {
                     var chunk = new Chunk().init(y, x, z);
                     this.buffers.push(gl.getBuffers(chunk.mesh));
                     delete chunk.mesh;
-                    this.chunks[this.chunks.length - 1][this.chunks[0].length - 1].push(chunk);
+
+                    this.chunks[y][x][z] = chunk;
                 }
             }
         }
@@ -33,6 +36,22 @@ var Chunks = {
     tick: function () {
 
     },
+
+    getChunk: function (target) {
+
+        var cs = this.CHUNK_SIZE,
+            offs = [
+                Math.floor(target.pos.y / this.CHUNK_SIZE),
+                Math.floor(target.pos.x / this.CHUNK_SIZE),
+                Math.floor(target.pos.z / this.CHUNK_SIZE)
+            ];
+
+        var y = this.chunks[offs[0]],
+            x = y ? y[offs[1]] : null,
+            z = x ? x[offs[2]] : null;
+        return z;
+    },
+
     render: function (gl, camera) {
 
         gl.render(this.buffers, camera);

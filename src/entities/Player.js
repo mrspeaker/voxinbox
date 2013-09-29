@@ -12,8 +12,9 @@ function Player() {
     this.falling = false;
     this.jumpSpeed = 0;
 
-    this.eyeH = 0.5; //1.62;
+    this.eyeH = 0.5;//1.62;
     this.w = 0.6;
+    this.d = 0.6;
     this.h = 1.8;
 
     this.tmp = null;
@@ -46,33 +47,41 @@ Player.prototype = {
         this.acceleration.y = 0;
 
         var worldPos = [
-                Math.floor(-this.pos.y + moves.y),
-                Math.floor(-this.pos.x),
-                Math.floor(this.pos.z)],
-            chunkPos = worldPos.map(function (p) { return Math.floor(p / chunks.CHUNK_SIZE); }),
-            inWorld = chunkPos.every(function(c) { return c >= 0; });
+            Math.floor(this.pos.y + moves.y),
+            Math.floor(this.pos.x + (this.w / 2)),
+            Math.floor(this.pos.z + (this.d / 2))],
 
-        if (inWorld) {
-            var chunk = chunks.chunks[chunkPos[0]][chunkPos[1]][chunkPos[2]];
-            if (!chunk) {
-                //console.error(chunkPos, chunks);
-                this.pos.y += moves.y;
-                this.pos.x += moves.x;
-                this.pos.z += moves.z;
-                return;
-                //throw new Error("no chunk");
-            }
+        chunk = chunks.getChunk(this);
+        if(!chunk) {
+            game.msg = "no chunk"
+            this.pos.y += moves.y;
+            this.pos.x += moves.x;
+            this.pos.z += moves.z;
+        }
+
+        if (chunk) {
+
+            var yw = worldPos[0] % chunks.CHUNK_SIZE;
+            if (yw < 0) yw += chunks.CHUNK_SIZE;
+            var xw = (worldPos[1] - chunk.chunkOffs.x) % chunks.CHUNK_SIZE;
+            if (xw < 0) xw += chunks.CHUNK_SIZE;
+            var zw = (worldPos[2] - chunk.chunkOffs.z) % chunks.CHUNK_SIZE;
+            if (zw < 0) zw += chunks.CHUNK_SIZE;
+
             var block = chunk.blocks
-                [worldPos[0] % chunks.CHUNK_SIZE]
-                [worldPos[1] % chunks.CHUNK_SIZE]
-                [worldPos[2] % chunks.CHUNK_SIZE];
+                [yw]
+                [xw]
+                [zw];
 
             if (!block) {
                 console.error(worldPos, chunk.blocks);
                 throw new Error("no block");
             }
 
+            game.msg = worldPos.join(" ") + "---"  + yw + ":" + xw + ":" + zw + " --- ";
+
             if (block.isActive) {
+                game.msg += "hit";
                 this.falling = false;
                 moves.y = 0;
                 if (this.velocity.y < 0) {
@@ -123,12 +132,12 @@ Player.prototype = {
 
         if (Input.isDown("forward")) {
             var rot = this.rotation.y;
-            xo -= speed * Math.sin(rot * (Math.PI / 180.0));
-            zo += speed * Math.cos(rot * (Math.PI / 180.0));
+            xo += speed * Math.sin(rot * (Math.PI / 180.0));
+            zo -= speed * Math.cos(rot * (Math.PI / 180.0));
         }
         if (Input.isDown("backward")) {
-            xo += speed * Math.sin(this.rotation.y * (Math.PI / 180.0));
-            zo -= speed * Math.cos(this.rotation.y * (Math.PI / 180.0));
+            xo -= speed * Math.sin(this.rotation.y * (Math.PI / 180.0));
+            zo += speed * Math.cos(this.rotation.y * (Math.PI / 180.0));
         }
         if (Input.isDown("strafe_left")) {
             zo += speed;
@@ -148,7 +157,7 @@ Player.prototype = {
                 xo = 0;
                 yo = 0;
                 zo = 0;
-                this.pos.x = -parseInt(k);
+                this.pos.x = parseInt(k);
                 this.pos.z = this.pos.x;
 
                 this.velocity.x = 0;

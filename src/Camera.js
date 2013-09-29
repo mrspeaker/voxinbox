@@ -32,9 +32,9 @@ Camera.prototype = {
 
         //Moving
         tmp = id.slice(0);
-        tmp[12] = this.pos.X;
+        tmp[12] = this.pos.X * -1;
         tmp[13] = this.pos.Y * -1;
-        tmp[14] = this.pos.Z;
+        tmp[14] = this.pos.Z * -1;
 
         out =  matrix.mult(out, tmp);
 
@@ -71,9 +71,9 @@ Camera.prototype = {
 
     tick: function (target) {
 
-        this.pos.Y = (target.pos.y) * 2;
-        this.pos.X = (target.pos.x + target.w / 2) * 2;
-        this.pos.Z = (target.pos.z * 2) + target.eyeH;
+        this.pos.Y = (target.pos.y * 2) + target.eyeH;
+        this.pos.X = target.pos.x * 2;
+        this.pos.Z = target.pos.z * 2;
 
         this.rotation.Y = target.rotation.y;
         this.rotation.X = target.rotation.x;
