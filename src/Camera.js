@@ -1,23 +1,8 @@
 function Camera() {
 
-    this.pos = {
-        X: -7.7,
-        Y: -28,
-        Z: 30
-    };
-
-    this.scale = {
-        X: 1.0,
-        Y: 1.0,
-        Z: 1.0
-    };
-
-    this.rotation = {
-        X: -90,
-        Y: 0,
-        Z: 0
-    }
-
+    this.pos = { X: 0, Y: 0, Z: 0 };
+    this.scale = { X: 1.0, Y: 1.0, Z: 1.0 };
+    this.rotation = { X: 0, Y: 0, Z: 0 }
 };
 
 Camera.prototype = {
@@ -27,9 +12,9 @@ Camera.prototype = {
         return this;
     },
 
-    set: function (x, y, z) {
-        this.pos.x = x;
+    set: function (y, x, z) {
         this.pos.y = y;
+        this.pos.x = x;
         this.pos.z = z;
     },
 
@@ -48,8 +33,8 @@ Camera.prototype = {
         //Moving
         tmp = id.slice(0);
         tmp[12] = this.pos.X;
-        tmp[13] = this.pos.Y;
-        tmp[14] = this.pos.Z * -1;
+        tmp[13] = this.pos.Y * -1;
+        tmp[14] = this.pos.Z;
 
         out =  matrix.mult(out, tmp);
 
@@ -86,12 +71,12 @@ Camera.prototype = {
 
     tick: function (target) {
 
-        this.pos.X = target.pos.x;
-        this.pos.Y = target.pos.y;
-        this.pos.Z = target.pos.z + 1.4;
+        this.pos.Y = (target.pos.y) * 2;
+        this.pos.X = (target.pos.x + target.w / 2) * 2;
+        this.pos.Z = (target.pos.z * 2) + target.eyeH;
 
-        this.rotation.X = target.rotation.x;
         this.rotation.Y = target.rotation.y;
+        this.rotation.X = target.rotation.x;
         this.rotation.Z = target.rotation.z;
 
     }

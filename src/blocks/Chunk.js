@@ -5,50 +5,61 @@ function Chunk() {
 }
 Chunk.prototype = {
 
-    init: function (x, y, z) {
-        this.off = [x, y, z];
+    init: function (y, x, z) {
+        this.off = [y, x, z];
         this.createChunk();
-        this.createMesh(x * this.CHUNK_SIZE, y * this.CHUNK_SIZE, z * this.CHUNK_SIZE);
+        this.createMesh(y * this.CHUNK_SIZE, x * this.CHUNK_SIZE, z * this.CHUNK_SIZE);
         return this;
     },
 
     createChunk: function () {
-        var rad = this.CHUNK_SIZE / 2;
         this.blocks = [];
-        for (var x = 0; x < this.CHUNK_SIZE; x++) {
+        for (var y = 0; y < this.CHUNK_SIZE; y++) {
             this.blocks.push([]);
-            for (var y = 0; y < this.CHUNK_SIZE; y++) {
-                this.blocks[x].push([]);
-                var value2d = game.simplex.noise3D(
-                    (this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 5,
-                    (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 5,
-                    (this.off[2] * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 5);
-                value2d = (value2d + 0.5) * 0.5;
+            for (var x = 0; x < this.CHUNK_SIZE; x++) {
+                this.blocks[y].push([]);
+                // var value2d = game.simplex.noise3D(
+                //     (this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 5,
+                //     (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 5,
+                //     (this.off[2] * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 5);
+                // value2d = (value2d + 0.5) * 0.5;
 
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {
-                    this.blocks[x][y][z] = new Block();
-                    if (z / this.CHUNK_SIZE < value2d) {
-                        this.blocks[x][y][z].isActive = true;
+                    this.blocks[y][x][z] = new Block();
+                    // if (z / this.CHUNK_SIZE < value2d) {
+                    //     this.blocks[x][y][z].isActive = true;
+                    // }
+                    if (y === 0) {
+                        this.blocks[y][x][z].isActive = true;
+                    }
+                    if (y === 1) {
+                        if (x === 0 && z  === 0) {
+                            this.blocks[y][x][z].isActive = true;
+                        }
+                        if (x === 1 && z  === 0) {
+                            this.blocks[y][x][z].isActive = true;
+                        }
                     }
                 }
             }
         }
 
+        // Empty out invisible blocks
         var toHide = [];
-        for (var x = 1; x < this.CHUNK_SIZE - 2; x++) {
+        for (var y = 1; y < this.CHUNK_SIZE - 2; y++) {
             this.blocks.push([]);
-            for (var y = 1; y < this.CHUNK_SIZE - 2; y++) {
-                this.blocks[x].push([]);
+            for (var x = 1; x < this.CHUNK_SIZE - 2; x++) {
+                this.blocks[y].push([]);
                 for (var z = 1; z < this.CHUNK_SIZE - 2; z++) {
-                    var block = this.blocks[x][y][z];
+                    var block = this.blocks[y][x][z];
                     if (block.isActive) {
                         if (
-                            this.blocks[x - 1][y][z].isActive &&
-                            this.blocks[x + 1][y][z].isActive &&
-                            this.blocks[x][y - 1][z].isActive &&
-                            this.blocks[x][y + 1][z].isActive &&
-                            this.blocks[x][y][z + 1].isActive &&
-                            this.blocks[x][y][z - 1].isActive
+                            this.blocks[y - 1][x][z].isActive &&
+                            this.blocks[y + 1][x][z].isActive &&
+                            this.blocks[y][x - 1][z].isActive &&
+                            this.blocks[y][x + 1][z].isActive &&
+                            this.blocks[y][x][z + 1].isActive &&
+                            this.blocks[y][x][z - 1].isActive
                         ) {
                             toHide.push(block);
                         }
@@ -61,30 +72,20 @@ Chunk.prototype = {
         });
     },
 
-    createMesh: function (xo, yo, zo) {
+    createMesh: function (yo, xo, zo) {
         this.mesh = {
             verts: [],
             indices: [],
             colors: []
         };
-        var cubeid = 0,
-            total = 0;
-        for (var x = 0; x < this.CHUNK_SIZE; x++) {
-            for (var y = 0; y < this.CHUNK_SIZE; y++) {
+        var cubeid = 0;
+
+        for (var y = 0; y < this.CHUNK_SIZE; y++) {
+            for (var x = 0; x < this.CHUNK_SIZE; x++) {
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {
-                    var block = this.blocks[x][y][z];
+                    var block = this.blocks[y][x][z];
                     if (block.isActive) {
-                        total++;
-                    }
-                }
-            }
-        }
-        for (var x = 0; x < this.CHUNK_SIZE; x++) {
-            for (var y = 0; y < this.CHUNK_SIZE; y++) {
-                for (var z = 0; z < this.CHUNK_SIZE; z++) {
-                    var block = this.blocks[x][y][z];
-                    if (block.isActive) {
-                        var cube = this.createCube(block, xo + x, yo + y, zo + z, cubeid, total);
+                        var cube = this.createCube(block, yo + y, xo + x, zo + z, cubeid);
                         cube.verts.forEach(function (v) {
                             this.mesh.verts.push(v);
                         }, this);
@@ -101,7 +102,7 @@ Chunk.prototype = {
         }
     },
 
-    createCube: function (block, xo, yo, zo, id, total) {
+    createCube: function (block, yo, xo, zo, id) {
         var verts = [],
             cols = [],
             indices = [];

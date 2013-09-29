@@ -10,24 +10,40 @@ var game = {
         this.input.bind({
             "left": "left",
             "right": "right",
-            "up": "up",
-            "down": "down",
-            "forward": "w",
-            "backward": "s",
+            "forward": "up",
+            "backward": "down",
+            "up": "w",
+            "down": "s",
             "strafe_left": "a",
             "strafe_right": "d",
-            "fire": "space"
+            "fire": "space",
+            "0": 48,
+            "1": 49,
+            "2": 50,
+            "3": 51,
+            "4": 52,
+            "5": 53,
+            "6": 54
 
         });
 
         this.camera = new Camera().init();
         this.simplex = new SimplexNoise();
-        this.player = new Player().init(-10, -10, 15);
+        this.player = new Player().init(2, 2, 1);
 
         webgl.init(document.querySelector("#board"));
+        this.initHud();
 
         this.chunks = Chunks.init(webgl);
+
+        this.last = Date.now();
         this.run();
+
+    },
+
+    initHud: function () {
+
+        this.hud = document.querySelector("#hud").getContext("2d");
 
     },
 
@@ -36,8 +52,8 @@ var game = {
             self = this;
         this.dt = this.dt + Math.min(1, (now - this.last) / 1000);
         while(this.dt > this.step) {
-          this.dt = this.dt - this.step;
-          this.tick(this.step);
+            this.dt = this.dt - this.step;
+            this.tick(this.step);
         }
         this.render(this.dt);
         this.last = now;
@@ -57,6 +73,25 @@ var game = {
     render: function (dt) {
 
         this.chunks.render(webgl, this.camera);
+
+        var c = this.hud;
+        c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+        c.fillStyle = "#fff";
+        c.fillText(
+            "p: " + this.player.pos.x.toFixed(2) +
+            " " + this.player.pos.z.toFixed(2) +
+            " " + this.player.pos.y.toFixed(2),
+            10,
+            15
+        );
+
+        c.fillText(
+            "c: " + this.player.getChunk().join(" "),
+            10,
+            30
+        );
+
+        c.fillText("r: " + this.player.rotation.y.toFixed(2), 10, 45)
 
     }
 }

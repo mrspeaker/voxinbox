@@ -1,7 +1,10 @@
 var Chunks = {
-    xrange: 4,
-    yrange: 4,
-    zrange: 3,
+    ys: 0,
+    ye: 1,
+    xs: -5,
+    xe: 5,
+    zs: -1,
+    ze: 1,
 
     CHUNK_SIZE: 16,
 
@@ -13,15 +16,15 @@ var Chunks = {
         this.chunks = [];
         this.buffers = [];
 
-        for (var i = 0; i < this.xrange; i++) {
+        for (var y = this.ys; y < this.ye; y++) {
             this.chunks.push([]);
-            for (var j = 0; j < this.yrange; j++) {
-                this.chunks[i].push([]);
-                for (var k = 0; k < this.zrange; k++) {
-                    var chunk = new Chunk().init(i, j, k);
+            for (var x = this.xs; x < this.xe; x++) {
+                this.chunks[this.chunks.length - 1].push([]);
+                for (var z = this.zs; z < this.ze; z++) {
+                    var chunk = new Chunk().init(y, x, z);
                     this.buffers.push(gl.getBuffers(chunk.mesh));
                     delete chunk.mesh;
-                    this.chunks[i][j].push(chunk);
+                    this.chunks[this.chunks.length - 1][this.chunks[0].length - 1].push(chunk);
                 }
             }
         }
