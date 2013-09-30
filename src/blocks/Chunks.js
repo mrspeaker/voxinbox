@@ -1,10 +1,10 @@
 var Chunks = {
     ys: 0,
     ye: 1,
-    xs: -5,
-    xe: 5,
-    zs: -1,
-    ze: 1,
+    xs: -3,
+    xe: 3,
+    zs: -2,
+    ze: 2,
 
     CHUNK_SIZE: 16,
 

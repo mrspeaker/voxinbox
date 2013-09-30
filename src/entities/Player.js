@@ -7,7 +7,7 @@ function Player() {
 
     this.speed = 4.3; // m/s
     this.rotSpeed = 43;
-    this.gravity = { x:0, y:0, z: -9.8 * 0.7 };
+    this.gravity = { x:0, y:-9.8 * 0.7, z: 0 };
 
     this.falling = false;
     this.jumpSpeed = 0;
@@ -41,15 +41,10 @@ Player.prototype = {
 
             this.velocity.y += this.gravity.y * dt;
 
-            moves.y = this.velocity.z;
+            //moves.y = this.velocity.y;
 
         }
         this.acceleration.y = 0;
-
-        var worldPos = [
-            Math.floor(this.pos.y + moves.y),
-            Math.floor(this.pos.x + (this.w / 2)),
-            Math.floor(this.pos.z + (this.d / 2))],
 
         chunk = chunks.getChunk(this);
         if(!chunk) {
@@ -61,24 +56,28 @@ Player.prototype = {
 
         if (chunk) {
 
-            var yw = worldPos[0] % chunks.CHUNK_SIZE;
-            if (yw < 0) yw += chunks.CHUNK_SIZE;
-            var xw = (worldPos[1] - chunk.chunkOffs.x) % chunks.CHUNK_SIZE;
-            if (xw < 0) xw += chunks.CHUNK_SIZE;
-            var zw = (worldPos[2] - chunk.chunkOffs.z) % chunks.CHUNK_SIZE;
-            if (zw < 0) zw += chunks.CHUNK_SIZE;
+            var worldPos = [
+                Math.floor(this.pos.y),
+                Math.floor(this.pos.x + (this.w / 2)),
+                Math.floor(this.pos.z + (this.d / 2))];
 
-            var block = chunk.blocks
-                [yw]
-                [xw]
-                [zw];
+            var block = chunk.getBlock(
+                worldPos[0],
+                worldPos[1],
+                worldPos[2]
+            );
 
-            if (!block) {
-                console.error(worldPos, chunk.blocks);
+            if (!block[0]) {
+                console.error(worldPos, chunk.blocks, block);
                 throw new Error("no block");
             }
+            game.msg = worldPos.join(" ") + "---"  + block[1] + ":" + block[2] + ":" + block[3] + " --- ";
+            block = block[0];
 
-            game.msg = worldPos.join(" ") + "---"  + yw + ":" + xw + ":" + zw + " --- ";
+            /*worldPos = [
+                Math.floor(this.pos.y + moves.y),
+                Math.floor(this.pos.x + (this.w / 2)),
+                Math.floor(this.pos.z + (this.d / 2))];*/
 
             if (block.isActive) {
                 game.msg += "hit";
@@ -124,10 +123,10 @@ Player.prototype = {
         }
 
         if (Input.isDown("up")) {
-            yo += speed;
+            yo += speed * 10;
         }
         if (Input.isDown("down")) {
-            yo -= speed;
+            yo -= speed * 10;
         }
 
         if (Input.isDown("forward")) {
