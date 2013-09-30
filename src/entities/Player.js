@@ -7,12 +7,12 @@ function Player() {
 
     this.speed = 4.3; // m/s
     this.rotSpeed = 43;
-    this.gravity = { x:0, y:-9.8 * 0.7, z: 0 };
+    this.gravity = { x:0, y:-9.8 * 0.1, z: 0 };
 
     this.falling = false;
     this.jumpSpeed = 0;
 
-    this.eyeH = 0.5;//1.62;
+    this.eyeH = 0.5; //1.62;
     this.w = 0.6;
     this.d = 0.6;
     this.h = 1.8;
@@ -36,14 +36,10 @@ Player.prototype = {
         var moves = this.tickInput(dt, input);
 
         this.velocity.y += this.acceleration.y;
-
-        if (this.falling) {
-
+        //if (this.falling) {
             this.velocity.y += this.gravity.y * dt;
-
-            //moves.y = this.velocity.y;
-
-        }
+            moves.y += this.velocity.y;
+        //}
         this.acceleration.y = 0;
 
         chunk = chunks.getChunk(this);
@@ -52,51 +48,54 @@ Player.prototype = {
             this.pos.y += moves.y;
             this.pos.x += moves.x;
             this.pos.z += moves.z;
+            return
         }
 
-        if (chunk) {
+        var xo = this.pos.x + (this.w / 2),
+            zo = this.pos.z + (this.d / 2),
+            yo = this.pos.y,
+            block,
+            hitx = hity = hitz = false;
 
-            var worldPos = [
-                Math.floor(this.pos.y),
-                Math.floor(this.pos.x + (this.w / 2)),
-                Math.floor(this.pos.z + (this.d / 2))];
+        // Check moveX
+        block = chunk.getBlock(yo, xo + moves.x, zo);
+        if (block[0] && block[0].isActive) {
+            moves.x = 0;
+            hitx = true;
+        }
 
-            var block = chunk.getBlock(
-                worldPos[0],
-                worldPos[1],
-                worldPos[2]
-            );
+        // Check moveZ
+        block = chunk.getBlock(yo, xo + moves.x, zo + moves.z);
+        if (block[0] && block[0].isActive) {
+            moves.z = 0;
+            hitz = true;
+        }
 
-            if (!block[0]) {
-                console.error(worldPos, chunk.blocks, block);
-                throw new Error("no block");
+        // check moveY
+        block = chunk.getBlock(yo + moves.y, xo + moves.x, zo + moves.z);
+        if (!block[0] || block[0].isActive) {
+            this.falling = false;
+
+            // Snap to floor
+            moves.y = Math.floor(yo) - yo;
+            if (this.velocity.y < 0) {
+                this.velocity.y = 0;
+                this.acceleration.y = 0;
             }
-            game.msg = worldPos.join(" ") + "---"  + block[1] + ":" + block[2] + ":" + block[3] + " --- ";
-            block = block[0];
-
-            /*worldPos = [
-                Math.floor(this.pos.y + moves.y),
-                Math.floor(this.pos.x + (this.w / 2)),
-                Math.floor(this.pos.z + (this.d / 2))];*/
-
-            if (block.isActive) {
-                game.msg += "hit";
-                this.falling = false;
-                moves.y = 0;
-                if (this.velocity.y < 0) {
-                    this.velocity.y = 0;
-                    this.acceleration.y = 0;
-                }
-            } else {
-                this.falling = true;
-            }
+            hity = true;
+        } else {
+            this.falling = true;
         }
 
-        if(this.velocity.y > 3) {
-            this.velocity.y > 3;
+        //game.msg = (block[0].isActive ? "X" : "0") + ":" + moves.y.toFixed(2)  +":" + yo;
+
+        game.msg = hity + ":" + hitx + ":" + hitz;
+
+        if(this.velocity.y > 0.2) {
+            this.velocity.y > 0.2;
         }
-        if (this.velocity.y < -3) {
-            this.velocity.y  = -3;
+        if (this.velocity.y < -0.2) {
+            this.velocity.y  = -0.2;
         }
 
         this.pos.x += moves.x;
@@ -180,7 +179,7 @@ Player.prototype = {
     },
 
     jump: function () {
-        this.acceleration.z += 1.5;
+        this.acceleration.y += 1.5;
     }
 
 

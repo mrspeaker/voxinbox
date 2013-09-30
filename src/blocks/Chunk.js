@@ -12,32 +12,37 @@ Chunk.prototype = {
             y: y * this.CHUNK_SIZE,
             z: z * this.CHUNK_SIZE
         };
-        this.createChunk();
+        this.createChunk(y, x, z);
         this.createMesh(y * this.CHUNK_SIZE, x * this.CHUNK_SIZE, z * this.CHUNK_SIZE);
         return this;
     },
 
-    createChunk: function () {
+    createChunk: function (yo, xo, zo) {
         this.blocks = [];
         for (var y = 0; y < this.CHUNK_SIZE; y++) {
             this.blocks.push([]);
             for (var x = 0; x < this.CHUNK_SIZE; x++) {
                 this.blocks[y].push([]);
-                // var value2d = game.simplex.noise3D(
-                //     (this.off[0] * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 5,
-                //     (this.off[1] * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 5,
-                //     (this.off[2] * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 5);
-                // value2d = (value2d + 0.5) * 0.5;
 
                 for (var z = 0; z < this.CHUNK_SIZE; z++) {
+                    var value2d = game.simplex.noise3D(
+                    (yo * this.CHUNK_SIZE + y) / this.CHUNK_SIZE / 5,
+                    (xo * this.CHUNK_SIZE + x) / this.CHUNK_SIZE / 5,
+                    (zo * this.CHUNK_SIZE + z) / this.CHUNK_SIZE / 5);
+                    value2d = (value2d + 0.5) * 0.5;
+
                     this.blocks[y][x][z] = new Block();
-                    // if (z / this.CHUNK_SIZE < value2d) {
-                    //     this.blocks[x][y][z].isActive = true;
-                    // }
-                    if (y === 0) {
+                    if (y / this.CHUNK_SIZE < value2d) {
                         this.blocks[y][x][z].isActive = true;
                     }
-                    if (y === 1) {
+
+                    /*if (y === 0) {
+                        this.blocks[y][x][z].isActive = true;
+                    }
+                    if (y === 1 && Math.random() > 0.008) {
+                        this.blocks[y][x][z].isActive = true;
+                    }
+                    if (y === 2) {
                         if (x === 0 && z  === 0) {
                             this.blocks[y][x][z].isActive = true;
                         }
@@ -46,9 +51,9 @@ Chunk.prototype = {
                         }
                     }
 
-                    if (y === 1 && Math.random() < 0.01) {
-                            this.blocks[y][x][z].isActive = true;
-                    }
+                    if (y === 2 && Math.random() < 0.01) {
+                        this.blocks[y][x][z].isActive = true;
+                    }*/
                 }
             }
         }
@@ -212,9 +217,9 @@ Chunk.prototype = {
 
         var size = Chunks.CHUNK_SIZE;
 
-        y %= size;
-        x %= size;
-        z %= size;
+        y = Math.floor(y % size);
+        x = Math.floor(x % size);
+        z = Math.floor(z % size);
 
         if (y < 0) y += size;
         if (x < 0) x += size;

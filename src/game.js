@@ -31,7 +31,7 @@ var game = {
 
         this.camera = new Camera().init();
         this.simplex = new SimplexNoise();
-        this.player = new Player().init(2, 2, 5);
+        this.player = new Player().init(2, 2, 15);
 
         webgl.init(document.querySelector("#board"));
         this.initHud();
