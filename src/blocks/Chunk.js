@@ -36,10 +36,10 @@ Chunk.prototype = {
                         this.blocks[y][x][z].isActive = true;
                     }
 
-                    /*if (y === 0) {
+                    if (y === 0) {
                         this.blocks[y][x][z].isActive = true;
                     }
-                    if (y === 1 && Math.random() > 0.008) {
+                    /*if (y === 1 && Math.random() > 0.008) {
                         this.blocks[y][x][z].isActive = true;
                     }
                     if (y === 2) {

@@ -7,12 +7,12 @@ function Player() {
 
     this.speed = 4.3; // m/s
     this.rotSpeed = 43;
-    this.gravity = { x:0, y:-9.8 * 0.1, z: 0 };
+    this.gravity = { x:0, y:-9.8 * 0.6, z: 0 };
 
     this.falling = false;
     this.jumpSpeed = 0;
 
-    this.eyeH = 0.5; //1.62;
+    this.eyeH = 1.62;
     this.w = 0.6;
     this.d = 0.6;
     this.h = 1.8;
@@ -36,10 +36,8 @@ Player.prototype = {
         var moves = this.tickInput(dt, input);
 
         this.velocity.y += this.acceleration.y;
-        //if (this.falling) {
-            this.velocity.y += this.gravity.y * dt;
-            moves.y += this.velocity.y;
-        //}
+        this.velocity.y += this.gravity.y * dt;
+        moves.y += this.velocity.y;
         this.acceleration.y = 0;
 
         chunk = chunks.getChunk(this);
@@ -48,7 +46,7 @@ Player.prototype = {
             this.pos.y += moves.y;
             this.pos.x += moves.x;
             this.pos.z += moves.z;
-            return
+            return;
         }
 
         var xo = this.pos.x + (this.w / 2),
@@ -58,21 +56,22 @@ Player.prototype = {
             hitx = hity = hitz = false;
 
         // Check moveX
-        block = chunk.getBlock(yo, xo + moves.x, zo);
+        block = chunk.getBlock(yo, xo + moves.x, zo + moves.z);
         if (block[0] && block[0].isActive) {
             moves.x = 0;
+            moves.z = 0;
             hitx = true;
         }
 
-        // Check moveZ
+        /*// Check moveZ
         block = chunk.getBlock(yo, xo + moves.x, zo + moves.z);
         if (block[0] && block[0].isActive) {
             moves.z = 0;
             hitz = true;
-        }
+        }*/
 
         // check moveY
-        block = chunk.getBlock(yo + moves.y, xo + moves.x, zo + moves.z);
+        block = chunk.getBlock(moves.y < 0 ? yo + moves.y : yo - moves.y, xo + moves.x, zo + moves.z);
         if (!block[0] || block[0].isActive) {
             this.falling = false;
 
@@ -88,14 +87,13 @@ Player.prototype = {
         }
 
         //game.msg = (block[0].isActive ? "X" : "0") + ":" + moves.y.toFixed(2)  +":" + yo;
-
         game.msg = hity + ":" + hitx + ":" + hitz;
 
-        if(this.velocity.y > 0.2) {
-            this.velocity.y > 0.2;
+        if(this.velocity.y > 0.8) {
+            this.velocity.y > 0.8;
         }
-        if (this.velocity.y < -0.2) {
-            this.velocity.y  = -0.2;
+        if (this.velocity.y < -0.8) {
+            this.velocity.y  = -0.8;
         }
 
         this.pos.x += moves.x;
@@ -104,9 +102,6 @@ Player.prototype = {
 
     },
 
-    //1.0  sec = 4.3 blocks
-    //0.5  sec = 2.15 blocks
-    //0.25 sec = 1.075
     tickInput: function (dt, input) {
 
         var speed = this.speed * dt,
